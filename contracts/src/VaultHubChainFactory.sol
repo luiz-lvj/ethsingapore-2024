@@ -29,9 +29,13 @@ contract VaultHubChainFactory is Ownable, OApp, OAppOptionsType3, ERC721 {
     ERC20 public currencyToken;
     mapping(uint256 => address) public vaultHubChainAccounts;
 
+
+
     //omnichain mappings
-    mapping(uint256 => address) public spokeChainsRegistries; // chainId to RegistrySpokeChain
-    mapping(uint256 => address) public spokeChainsImplementations; // chainId to VaultSpokeChainAccount
+    mapping(uint256 => address) public spokeChainsRegistries; // ChainId to RegistrySpokeChain
+    mapping(uint256 => address) public spokeChainsImplementations; // ChainId to VaultSpokeChainAccount
+
+    mapping(uint256 => uint32) public spokeChainsIds; // ChainId to Eid
 
 
     //events
@@ -79,7 +83,7 @@ contract VaultHubChainFactory is Ownable, OApp, OAppOptionsType3, ERC721 {
     }
 
 
-    function createSpokeChainAccount(uint256 vaultId, uint256 chainId) public {
+    function createSpokeChainAccount(uint256 vaultId, uint256 chainId) public payable{
         require(_msgSender() == vaultHubChainAccounts[vaultId], "Only vault account can call this function");
 
         uint128 GAS_LIMIT = 1000000; // Gas limit for the executor
@@ -87,17 +91,26 @@ contract VaultHubChainFactory is Ownable, OApp, OAppOptionsType3, ERC721 {
 
         bytes memory options = OptionsBuilder.newOptions().addExecutorLzReceiveOption(GAS_LIMIT, MSG_VALUE);
 
-        // _lzSend(
-        //     1,
-        //     encodeMessage(spokeChainsImplementations[chainId], chainId, address(this), vaultId)
-            
-
-        // );
-
-
-
+        _lzSend(
+            spokeChainsIds[chainId],
+            encodeMessage(spokeChainsImplementations[chainId], chainId, address(this), vaultId),
+            options,
+            MessagingFee(msg.value, 0),
+            payable(msg.sender) 
+        );
 
     }
+
+    function quote(
+        uint32 _dstEid,
+        string memory _message,
+        bytes memory _options,
+        bool _payInLzToken
+    ) public view returns (MessagingFee memory fee) {
+        bytes memory payload = abi.encode(_message);
+        fee = _quote(_dstEid, payload, _options, _payInLzToken);
+    }
+    
 
     function _lzReceive(
         Origin calldata /*_origin*/,

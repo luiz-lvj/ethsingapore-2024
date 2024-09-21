@@ -61,6 +61,12 @@ contract VaultHubChainAccount is ERC20, IERC165, IERC1271, IERC6551Account, IERC
         emit Initialized(_factory, _currency);
     }
 
+
+    function registerNewSpokeChain(uint256 vaultId, uint256 chainId) public payable {
+        require(_isValidSigner(msg.sender), "Invalid signer");
+        factory.createSpokeChainAccount{ value: msg.value  }(vaultId, chainId);
+    }
+
     function evaluateHubChainTokens() public returns(uint256) {
 
         valueHubChainAccountUSD = 0;
