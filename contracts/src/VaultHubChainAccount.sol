@@ -4,15 +4,74 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/interfaces/IERC1271.sol";
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/utils/cryptography/SignatureChecker.sol";
 import "./interfaces/IERC6551Account.sol";
 import "./interfaces/IERC6551Executable.sol";
 
-contract HubChainAccount is IERC165, IERC1271, IERC6551Account, IERC6551Executable {
-    uint256 public state;
+import { VaultHubChainFactory } from "./VaultHubChainFactory.sol";
 
+contract VaultHubChainAccount is ERC20, IERC165, IERC1271, IERC6551Account, IERC6551Executable {
     receive() external payable {}
 
+
+    uint256 public state;
+    VaultHubChainFactory public factory;
+    ERC20 public currencyToken;
+    bool public isInitialized;
+
+
+    //modifiers
+    modifier onlyFactory() {
+        require(msg.sender == address(factory), "Only factory can call this function");
+        _;
+    }
+
+    modifier onlyNotInitialized() {
+        require(!isInitialized, "Already initialized");
+        _;
+    }
+
+    //events
+    event Initialized(address indexed factory, address indexed currency);
+    event Deposit(address indexed depositor, uint256 amountInTokenCurrency, uint256 amountInQuota);
+
+    constructor()  ERC20("TEST", "TEST") {
+        state = 0;
+    }
+
+    //CUSTOM FUNCTIONS
+    function initializeAccount(address _factory, address _currency) public onlyNotInitialized {
+        require(_isValidSigner(msg.sender), "Invalid signer");
+        currencyToken = ERC20(_currency);
+        factory = VaultHubChainFactory(_factory);
+        isInitialized = true;
+        emit Initialized(_factory, _currency);
+    }
+
+    function evaluateHubChainTokens() public view returns(uint256) {
+        return (address(factory), address(currencyToken));
+    }
+
+    function getQuotaPrice() public pure returns (uint256) {
+        return 3;
+    }
+
+    function deposit(uint256 _amountInCurrencyToken) public {
+        require(_isValidSigner(msg.sender), "Invalid signer");
+        
+        uint256 amountInQuota = _amountInCurrencyToken / getQuotaPrice();
+
+        currencyToken.transferFrom(msg.sender, address(this), _amountInCurrencyToken);
+
+        _mint(msg.sender, amountInQuota);
+
+
+        emit Deposit(msg.sender, _amountInCurrencyToken, amountInQuota);
+    }
+
+
+    // STANDARD ERC6551 FUNCTIONS
     function execute(
         address to,
         uint256 value,
@@ -21,6 +80,7 @@ contract HubChainAccount is IERC165, IERC1271, IERC6551Account, IERC6551Executab
     ) external payable returns (bytes memory result) {
         require(_isValidSigner(msg.sender), "Invalid signer");
         require(operation == 0, "Only call operations are supported");
+
 
         ++state;
 
