@@ -24,6 +24,7 @@ contract VaultHubChainFactory is ERC721, Ownable {
 
     //events
     event VaultCreated(address indexed owner, uint256 indexed vaultId, address indexed vaultAccount);
+    event SecuritySourceSet(address indexed securitySource);
 
 
     constructor(address _initialOwner, address _register, address _implementation, address _currency) ERC721("VaultHubChain", "VHC") Ownable(_initialOwner)  {
@@ -34,6 +35,7 @@ contract VaultHubChainFactory is ERC721, Ownable {
 
     function setSecuritySourceHubchain(address _securitySource) public onlyOwner {
         securitySource = SecuritySource(_securitySource);
+        emit SecuritySourceSet(_securitySource);
     }
 
     function createVault() public returns (uint256){
