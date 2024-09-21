@@ -38,6 +38,7 @@ contract RiskHook is BaseHook {
     //Custom errors
     error CurrencyNotWhitelisted(address token);
     error VolatilityExceeded(uint256 totalValueInVolatility, uint256 maxVolatility);
+    error NoTotalVallueInUSD();
 
     SecuritySource securitySource;
 
@@ -70,7 +71,7 @@ contract RiskHook is BaseHook {
 
     function beforeSwap(address, PoolKey calldata key, IPoolManager.SwapParams calldata, bytes calldata)
         external
-        override
+        override view
         returns (bytes4, BeforeSwapDelta, uint24)
     {
         //address wallet = IUniversalRouter(sender).msgSender();
@@ -92,27 +93,24 @@ contract RiskHook is BaseHook {
 
     function afterSwap(address, PoolKey calldata key, IPoolManager.SwapParams calldata swapParams, BalanceDelta delta, bytes calldata hookData )
         external
-        override
+        override view
         returns (bytes4, int128)
     {
-        uint128 amount0 = delta.amount0() > 0 ? uint128(delta.amount0()) : uint128(-delta.amount0());
-        uint128 amount1 = delta.amount1() > 0 ? uint128(delta.amount1()) : uint128(-delta.amount1());
 
-        address currency0 = Currency.unwrap(key.currency0);
-        address currency1 = Currency.unwrap(key.currency1);
+        (int price0, int vol0) = getPriceAndVol(Currency.unwrap(key.currency0));
+        (int price1, int vol1) = getPriceAndVol(Currency.unwrap(key.currency1));
 
-        (int price0, int vol0) = getPriceAndVol(currency0);
-        (int price1, int vol1) = getPriceAndVol(currency1);
+        bool zeroForOne = swapParams.zeroForOne;
+        
+        int256 deltaTotalVolatility = getDeltaTotalVolatility(absDelta(delta.amount0()),absDelta(delta.amount1()), price0, price1, vol0, vol1, zeroForOne);
 
-        int256 deltaTotalVolatility = getDeltaTotalVolatility(amount0, amount1, price0, price1, vol0, vol1, swapParams.zeroForOne);
+        MultiVault walletVault = MultiVault(abi.decode(hookData, (address)));
 
-        address wallet = abi.decode(hookData, (address));
+        (uint256 totalValueInUSD, uint256 totalValueInVolatility, uint256 maxVolatility) = getVaultDetails(walletVault);
 
-        MultiVault walletVault = MultiVault(wallet);
-
-        uint256 totalValueInUSD = walletVault.getTotalValueInUSD();
-        uint256 totalValueInVolatility = walletVault.getTotalValueInVolatility();
-        uint256 maxVolatility = walletVault.getMaxVolatility();
+        if(totalValueInUSD <= 0){
+            revert NoTotalVallueInUSD();
+        }
 
 
         int256 newVolatilityValue = (int256(totalValueInVolatility) + deltaTotalVolatility)/int256(totalValueInUSD);
@@ -146,10 +144,10 @@ contract RiskHook is BaseHook {
 
     function beforeRemoveLiquidity(
         address,
-        PoolKey calldata key,
+        PoolKey calldata,
         IPoolManager.ModifyLiquidityParams calldata,
         bytes calldata
-    ) external override returns (bytes4) {
+    ) external override pure returns (bytes4) {
         return BaseHook.beforeRemoveLiquidity.selector;
     }
 
@@ -164,8 +162,8 @@ contract RiskHook is BaseHook {
     }
 
     function getDeltaTotalVolatility(uint256 amount0, uint256 amount1, int price0, int price1, int vol0, int vol1, bool zeroForOne) internal pure returns (int256) {
-        uint256 value0 = amount0 * uint256(price0) * uint256(vol0);
-        uint256 value1 = amount1 * uint256(price1) * uint256(vol1);
+        uint256 value0 = calculateValue(amount0, price0, vol0);
+        uint256 value1 = calculateValue(amount1, price1, vol1);
 
         int256 deltaTotalVolatility;
 
@@ -176,5 +174,19 @@ contract RiskHook is BaseHook {
         }
 
         return deltaTotalVolatility;
+    }
+
+    function getVaultDetails(MultiVault vault) internal view returns(uint256, uint256, uint256) {
+        return(vault.getTotalValueInUSD(), vault.getTotalValueInVolatility(), vault.getMaxVolatility());
+    }
+
+    // Further reduce stack usage by moving volatility calculation into its own function
+    function calculateValue(uint256 amount, int price, int vol) internal pure returns (uint256) {
+        return amount * uint256(price) * uint256(vol);
+    }
+
+    // Helper to get absolute value of delta amounts
+    function absDelta(int128 delta) internal pure returns (uint128) {
+        return delta > 0 ? uint128(delta) : uint128(-delta);
     }
 }

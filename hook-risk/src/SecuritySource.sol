@@ -30,11 +30,9 @@ contract SecuritySource is Ownable {
 
         for(uint256 i = 0; i < _tokens.length; i++) {
             isWhitelistedERC20Token[_tokens[i]] = true;
-            tokenToPriceFeed[_priceFeeds[i]] = _priceFeeds[i];
-            tokenToVolatilityFeed[_volFeeds[i]] = _volFeeds[i];
+            tokenToPriceFeed[_tokens[i]] = _priceFeeds[i];
+            tokenToVolatilityFeed[_tokens[i]] = _volFeeds[i];
         }
-
-        console.log("Whitelisted tokens: ", _tokens.length);
     }
 }
 
