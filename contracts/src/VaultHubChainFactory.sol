@@ -15,8 +15,8 @@ import { OAppOptionsType3 } from "@layerzerolabs/oapp-evm/oapp/libs/OAppOptionsT
 import { OptionsBuilder } from "@layerzerolabs/oapp-evm/oapp/libs/OptionsBuilder.sol";
 
 
-
-contract VaultHubChainFactory is Ownable, OApp, OAppOptionsType3, ERC721 {
+// contract VaultHubChainFactory is Ownable, /*OApp, OAppOptionsType3,*/ ERC721 {
+contract VaultHubChainFactory is Ownable, ERC721 {
 
     using OptionsBuilder for bytes;
 
@@ -43,7 +43,7 @@ contract VaultHubChainFactory is Ownable, OApp, OAppOptionsType3, ERC721 {
     event SecuritySourceSet(address indexed securitySource);
 
     //TODO OApp initializer
-    constructor(address _initialOwner, address _register, address _implementation, address _currency) ERC721("VaultHubChain", "VHC") OApp(_initialOwner, _initialOwner) Ownable(_initialOwner)  {
+    constructor(address _initialOwner, address _register, address _implementation, address _currency) ERC721("VaultHubChain", "VHC")  Ownable(_initialOwner)  {
         registry = IERC6551Registry(_register);
         implementation = VaultHubChainAccount(payable(_implementation));
         currencyToken = ERC20(_currency);
@@ -91,36 +91,36 @@ contract VaultHubChainFactory is Ownable, OApp, OAppOptionsType3, ERC721 {
 
         bytes memory options = OptionsBuilder.newOptions().addExecutorLzReceiveOption(GAS_LIMIT, MSG_VALUE);
 
-        _lzSend(
-            spokeChainsIds[chainId],
-            encodeMessage(spokeChainsImplementations[chainId], chainId, address(this), vaultId),
-            options,
-            MessagingFee(msg.value, 0),
-            payable(msg.sender) 
-        );
+        // _lzSend(
+        //     spokeChainsIds[chainId],
+        //     encodeMessage(spokeChainsImplementations[chainId], chainId, address(this), vaultId),
+        //     options,
+        //     MessagingFee(msg.value, 0),
+        //     payable(msg.sender) 
+        // );
 
     }
 
-    function quote(
-        uint32 _dstEid,
-        string memory _message,
-        bytes memory _options,
-        bool _payInLzToken
-    ) public view returns (MessagingFee memory fee) {
-        bytes memory payload = abi.encode(_message);
-        fee = _quote(_dstEid, payload, _options, _payInLzToken);
-    }
+    // function quote(
+    //     uint32 _dstEid,
+    //     string memory _message,
+    //     bytes memory _options,
+    //     bool _payInLzToken
+    // ) public view returns (MessagingFee memory fee) {
+    //     bytes memory payload = abi.encode(_message);
+    //     fee = _quote(_dstEid, payload, _options, _payInLzToken);
+    // }
     
 
-    function _lzReceive(
-        Origin calldata /*_origin*/,
-        bytes32 /*_guid*/,
-        bytes calldata payload,
-        address /*_executor*/,
-        bytes calldata /*_extraData*/
-    ) internal override {
-        uint256 vaultId = abi.decode(payload, (uint256));
-    }
+    // function _lzReceive(
+    //     Origin calldata /*_origin*/,
+    //     bytes32 /*_guid*/,
+    //     bytes calldata payload,
+    //     address /*_executor*/,
+    //     bytes calldata /*_extraData*/
+    // ) internal override {
+    //     uint256 vaultId = abi.decode(payload, (uint256));
+    // }
 
     function encodeMessage(
         address erc6551implementationTarget,
