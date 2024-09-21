@@ -18,7 +18,7 @@ import { OptionsBuilder } from "@layerzerolabs/oapp-evm/oapp/libs/OptionsBuilder
 
 contract VaultHubChainFactory is Ownable, OApp, OAppOptionsType3, ERC721 {
 
-    //using OptionsBuilder for bytes;
+    using OptionsBuilder for bytes;
 
     uint256 public vaultCounter;
 
@@ -81,10 +81,9 @@ contract VaultHubChainFactory is Ownable, OApp, OAppOptionsType3, ERC721 {
 
     function createSpokeChainAccount(uint256 vaultId, uint256 chainId) public {
         require(_msgSender() == vaultHubChainAccounts[vaultId], "Only vault account can call this function");
-        bytes memory options = combineOptions(_dstEid, _msgType, _extraSendOptions);
 
-        uint256 GAS_LIMIT = 1000000; // Gas limit for the executor
-        uint256 MSG_VALUE = 0; // msg.value for the lzReceive() function on destination in wei
+        uint128 GAS_LIMIT = 1000000; // Gas limit for the executor
+        uint128 MSG_VALUE = 0; // msg.value for the lzReceive() function on destination in wei
 
         bytes memory options = OptionsBuilder.newOptions().addExecutorLzReceiveOption(GAS_LIMIT, MSG_VALUE);
 
