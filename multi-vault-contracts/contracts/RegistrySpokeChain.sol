@@ -29,11 +29,11 @@ library ERC6551BytecodeLib {
     }
 }
 
-contract ERC6551Registry is  OApp, IERC6551Registry {
+contract ERC6551RegistrySpokeChain is  OApp, IERC6551Registry {
     error InitializationFailed();
 
 
-    constructor() OApp(msg.sender, msg.sender) Ownable(msg.sender)  {}
+    constructor(address _initialOwner, address _endpoint) OApp(_endpoint, _initialOwner) Ownable(_initialOwner)  {}
 
     function setHubChainFactoryPeer(uint32 _hubChainEid, address _hubChainFactory) public onlyOwner {
         setPeer(_hubChainEid, bytes32(uint256(uint160(_hubChainFactory))));

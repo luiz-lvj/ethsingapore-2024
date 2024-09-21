@@ -102,7 +102,7 @@ contract VaultHubChainFactory is Ownable, OApp, OAppOptionsType3,  ERC721 {
 
         _lzSend(
             spokeChainsIds[chainId],
-            encodeMessage(spokeChainsImplementations[chainId], chainId, address(this), vaultId),
+            encodeMessage(spokeChainsImplementations[chainId], block.chainid, address(this), vaultId),
             options,
             MessagingFee(msg.value, 0),
             payable(msg.sender) 
