@@ -53,6 +53,7 @@ library EasyPosm {
         // Mint Liquidity
         tokenId = posm.nextTokenId();
         uint256 valueToPass = currency0.isAddressZero() ? amount0Max : 0;
+
         posm.modifyLiquidities{value: valueToPass}(
             abi.encode(abi.encodePacked(uint8(Actions.MINT_POSITION), uint8(Actions.SETTLE_PAIR)), mintData.params),
             deadline

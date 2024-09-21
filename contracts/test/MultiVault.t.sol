@@ -165,7 +165,7 @@ contract VaultTest is Test {
 
         token1.mint(account, 1 ether);
 
-        uint256 amount = VaultHubChainAccount(payable(account)).evaluateTotalValue();
+        (uint256 amount, ) = VaultHubChainAccount(payable(account)).evaluateTotalValue();
 
         uint256 amountExpected;
 

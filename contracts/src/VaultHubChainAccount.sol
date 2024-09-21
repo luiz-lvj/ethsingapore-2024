@@ -31,6 +31,8 @@ contract VaultHubChainAccount is ERC20, IERC165, IERC1271, IERC6551Account, IERC
     uint256 public totalValueInUSD;
     uint256 public totalValueInVolatility;
 
+    uint256 public maxVolatility;
+
 
     //modifiers
     modifier onlyFactory() {
@@ -67,7 +69,7 @@ contract VaultHubChainAccount is ERC20, IERC165, IERC1271, IERC6551Account, IERC
         factory.createSpokeChainAccount{ value: msg.value  }(vaultId, chainId);
     }
 
-    function evaluateHubChainTokens() public returns(uint256) {
+    function evaluateHubChainTokens() public returns(uint256, uint256) {
 
         valueHubChainAccountUSD = 0;
         valueHubChainAccountVolatility = 0;
@@ -90,20 +92,37 @@ contract VaultHubChainAccount is ERC20, IERC165, IERC1271, IERC6551Account, IERC
             valueHubChainAccountVolatility += balance * uint256(vol) / 10 ** erc20Token.decimals();
         }
 
-        return valueHubChainAccountUSD;
+        return (valueHubChainAccountUSD, valueHubChainAccountVolatility);
     }
 
 
-    function evaluateTotalValue() public returns(uint256) {
+    function evaluateTotalValue() public returns(uint256, uint256) {
         // Evaluate from hub chain and all spoke chains
 
         //TODO - Implement spoke chains evaluation
 
-        uint256 hubChainValue = evaluateHubChainTokens();
+        (uint256 hubChainValue, uint256 hubChainVol) = evaluateHubChainTokens();
 
         totalValueInUSD = hubChainValue;
+        totalValueInVolatility = hubChainVol;
 
+        return (totalValueInUSD, totalValueInVolatility);
+    }
+
+    function getTotalVaultVolatility() public view returns(uint256) {
+        return totalValueInVolatility/totalValueInUSD;
+    }
+
+    function getTotalValueInUSD() external view returns(uint256) {
         return totalValueInUSD;
+    }
+
+    function getTotalValueInVolatility() external view returns(uint256) {
+        return totalValueInVolatility;
+    }
+
+    function getMaxVolatility() external view returns(uint256) {
+        return maxVolatility;
     }
 
     
