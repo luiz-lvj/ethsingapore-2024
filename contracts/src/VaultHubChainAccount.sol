@@ -9,16 +9,27 @@ import "@openzeppelin/contracts/utils/cryptography/SignatureChecker.sol";
 import "./interfaces/IERC6551Account.sol";
 import "./interfaces/IERC6551Executable.sol";
 
+import {AggregatorV3Interface} from "@chainlink/contracts/v0.8/interfaces/AggregatorV3Interface.sol";
+
 import { VaultHubChainFactory } from "./VaultHubChainFactory.sol";
+import { SecuritySource } from "./SecuritySource.sol";
+
+import { console } from "forge-std/Test.sol";
 
 contract VaultHubChainAccount is ERC20, IERC165, IERC1271, IERC6551Account, IERC6551Executable {
     receive() external payable {}
 
-
     uint256 public state;
     VaultHubChainFactory public factory;
+    SecuritySource public securitySource;
     ERC20 public currencyToken;
     bool public isInitialized;
+
+    uint256 public valueHubChainAccountUSD;
+    uint256 public valueHubChainAccountVolatility;
+
+    uint256 public totalValueInUSD;
+    uint256 public totalValueInVolatility;
 
 
     //modifiers
@@ -41,25 +52,66 @@ contract VaultHubChainAccount is ERC20, IERC165, IERC1271, IERC6551Account, IERC
     }
 
     //CUSTOM FUNCTIONS
-    function initializeAccount(address _factory, address _currency) public onlyNotInitialized {
+    function initializeAccount(address _factory, address _currency, address _securitySource) public onlyNotInitialized {
         require(_isValidSigner(msg.sender), "Invalid signer");
         currencyToken = ERC20(_currency);
         factory = VaultHubChainFactory(_factory);
+        securitySource = SecuritySource(_securitySource);
         isInitialized = true;
         emit Initialized(_factory, _currency);
     }
 
-    function evaluateHubChainTokens() public view returns(uint256) {
-        return (address(factory), address(currencyToken));
+    function evaluateHubChainTokens() public returns(uint256) {
+
+        valueHubChainAccountUSD = 0;
+        valueHubChainAccountVolatility = 0;
+        uint256 numberWhiteListedTokens = securitySource.numberWhitelistedERC20Tokens();
+
+        for(uint256 i = 0; i < numberWhiteListedTokens; i++) {
+            ERC20 erc20Token = ERC20(securitySource.whitelistedERC20Tokens(i));
+            AggregatorV3Interface priceFeed = AggregatorV3Interface(securitySource.priceFeedsWhitelistedERC20Tokens(i));
+            AggregatorV3Interface volFeed = AggregatorV3Interface(securitySource.volatilityFeedsWhitelistedERC20Tokens(i));
+
+            uint256 balance = erc20Token.balanceOf(address(this));
+
+            int256 price;
+            int256 vol;
+
+            (, price, , , ) = priceFeed.latestRoundData();
+            (, vol, , , ) = volFeed.latestRoundData();
+
+            valueHubChainAccountUSD += balance * uint256(price) / 10 ** erc20Token.decimals();
+            valueHubChainAccountVolatility += balance * uint256(vol) / 10 ** erc20Token.decimals();
+        }
+
+        return valueHubChainAccountUSD;
     }
 
-    function getQuotaPrice() public pure returns (uint256) {
-        return 3;
+
+    function evaluateTotalValue() public returns(uint256) {
+        // Evaluate from hub chain and all spoke chains
+
+        //TODO - Implement spoke chains evaluation
+
+        uint256 hubChainValue = evaluateHubChainTokens();
+
+        totalValueInUSD = hubChainValue;
+
+        return totalValueInUSD;
+    }
+
+    
+
+    function getQuotaPrice() public view returns (uint256) {
+        if(totalSupply() == 0) {
+            return 1;
+        }
+        return totalValueInUSD / totalSupply();
     }
 
     function deposit(uint256 _amountInCurrencyToken) public {
         require(_isValidSigner(msg.sender), "Invalid signer");
-        
+
         uint256 amountInQuota = _amountInCurrencyToken / getQuotaPrice();
 
         currencyToken.transferFrom(msg.sender, address(this), _amountInCurrencyToken);

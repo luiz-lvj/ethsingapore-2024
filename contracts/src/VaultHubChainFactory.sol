@@ -7,6 +7,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 import { IERC6551Registry } from "./interfaces/IERC6551Registry.sol";
 import { VaultHubChainAccount } from "./VaultHubChainAccount.sol";
+import { SecuritySource } from "./SecuritySource.sol";
 
 
 
@@ -15,12 +16,11 @@ contract VaultHubChainFactory is ERC721, Ownable {
 
     IERC6551Registry public registry;
     VaultHubChainAccount public implementation;
+    SecuritySource public securitySource;
     
     ERC20 public currencyToken;
 
     mapping(uint256 => address) public vaultHubChainAccounts;
-
-    address[] public whitelistedERC20Tokens;
 
     //events
     event VaultCreated(address indexed owner, uint256 indexed vaultId, address indexed vaultAccount);
@@ -30,6 +30,10 @@ contract VaultHubChainFactory is ERC721, Ownable {
         registry = IERC6551Registry(_register);
         implementation = VaultHubChainAccount(payable(_implementation));
         currencyToken = ERC20(_currency);
+    }
+
+    function setSecuritySourceHubchain(address _securitySource) public onlyOwner {
+        securitySource = SecuritySource(_securitySource);
     }
 
     function createVault() public returns (uint256){
@@ -48,7 +52,7 @@ contract VaultHubChainFactory is ERC721, Ownable {
             ""
         );
 
-        VaultHubChainAccount(payable(vaultAccount)).initializeAccount(address(this), address(currencyToken));
+        VaultHubChainAccount(payable(vaultAccount)).initializeAccount(address(this), address(currencyToken), address(securitySource));
 
         _transfer(address(this), msg.sender, vaultId);
 
@@ -58,9 +62,5 @@ contract VaultHubChainFactory is ERC721, Ownable {
 
         return vaultId;
 
-    }
-
-    function setWhitelistedERC20Tokens(address[] memory _tokens) public onlyOwner {
-        whitelistedERC20Tokens = _tokens;
     }
 }
