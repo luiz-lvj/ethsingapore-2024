@@ -35,6 +35,10 @@ contract ERC6551Registry is  OApp, IERC6551Registry {
 
     constructor() OApp(msg.sender, msg.sender) Ownable(msg.sender)  {}
 
+    function setHubChainFactoryPeer(uint32 _hubChainEid, address _hubChainFactory) public onlyOwner {
+        setPeer(_hubChainEid, bytes32(uint256(uint160(_hubChainFactory))));
+    }
+
     function _lzReceive(
         Origin calldata /*_origin*/,
         bytes32 /*_guid*/,
@@ -44,9 +48,8 @@ contract ERC6551Registry is  OApp, IERC6551Registry {
     ) internal override {
         (address implementation, uint256 chainId, address tokenContract, uint256 tokenId) = decodeMessage(payload);
         
-        address newAccount = createAccountWithoutInitData(implementation, chainId, tokenContract, tokenId, 0);
+        createAccountWithoutInitData(implementation, chainId, tokenContract, tokenId, 0);
 
-        
     }
 
     function decodeMessage(bytes calldata encodedMessage) public pure returns (address implementation, uint256 chainId, address tokenContract, uint256 tokenId) {

@@ -16,7 +16,7 @@ import { SecuritySource } from "./SecuritySource.sol";
 
 import { console } from "forge-std/Test.sol";
 
-contract VaultHubChainAccount is ERC20, IERC165, IERC1271, IERC6551Account, IERC6551Executable {
+contract VaultSpokeChainAccount is IERC165, IERC1271, IERC6551Account, IERC6551Executable {
     receive() external payable {}
 
     uint256 public state;
@@ -25,15 +25,13 @@ contract VaultHubChainAccount is ERC20, IERC165, IERC1271, IERC6551Account, IERC
     ERC20 public currencyToken;
     bool public isInitialized;
 
-    uint256 public valueHubChainAccountUSD;
-    uint256 public valueHubChainAccountVolatility;
+    uint256 public valueSpokeChainAccountUSD;
+    uint256 public valueSpokeChainAccountVolatility;
 
     uint256 public totalValueInUSD;
     uint256 public totalValueInVolatility;
 
     uint256 public maxVolatility;
-
-    mapping(uint256 => address) public spokeChainsImplementationsAccounts; // ChainId to SpokeChainAccount
 
 
     //modifiers
@@ -52,8 +50,7 @@ contract VaultHubChainAccount is ERC20, IERC165, IERC1271, IERC6551Account, IERC
     event Deposit(address indexed depositor, uint256 amountInTokenCurrency, uint256 amountInQuota);
     event SpokeChainRegistered(address indexed spokeChainAccount, uint256 indexed spokeChainId);
 
-    constructor()  ERC20("HUBChain", "HUBChain") {
-
+    constructor()  {
     }
 
     //CUSTOM FUNCTIONS
@@ -69,20 +66,16 @@ contract VaultHubChainAccount is ERC20, IERC165, IERC1271, IERC6551Account, IERC
 
     function registerNewSpokeChain(uint256 vaultId, uint256 chainId) public payable {
         require(_isValidSigner(msg.sender), "Invalid signer");
-        require(spokeChainsImplementationsAccounts[chainId] == address(0), "Spoke chain already registered");
-
         address newAccount = factory.createSpokeChainAccount{ value: msg.value  }(vaultId, chainId);
-
-        spokeChainsImplementationsAccounts[chainId] = newAccount;
 
         emit SpokeChainRegistered(newAccount, chainId);
 
     }
 
-    function evaluateHubChainTokens() public returns(uint256, uint256) {
+    function evaluateSpokeChainTokens() public returns(uint256, uint256) {
 
-        valueHubChainAccountUSD = 0;
-        valueHubChainAccountVolatility = 0;
+        valueSpokeChainAccountUSD = 0;
+        valueSpokeChainAccountVolatility = 0;
         uint256 numberWhiteListedTokens = securitySource.numberWhitelistedERC20Tokens();
 
         for(uint256 i = 0; i < numberWhiteListedTokens; i++) {
@@ -98,26 +91,13 @@ contract VaultHubChainAccount is ERC20, IERC165, IERC1271, IERC6551Account, IERC
             (, price, , , ) = priceFeed.latestRoundData();
             (, vol, , , ) = volFeed.latestRoundData();
 
-            valueHubChainAccountUSD += balance * uint256(price) / 10 ** erc20Token.decimals();
-            valueHubChainAccountVolatility += balance * uint256(vol) / 10 ** erc20Token.decimals();
+            valueSpokeChainAccountUSD += balance * uint256(price) / 10 ** erc20Token.decimals();
+            valueSpokeChainAccountVolatility += balance * uint256(vol) / 10 ** erc20Token.decimals();
         }
 
-        return (valueHubChainAccountUSD, valueHubChainAccountVolatility);
+        return (valueSpokeChainAccountUSD, valueSpokeChainAccountVolatility);
     }
 
-
-    function evaluateTotalValue() public returns(uint256, uint256) {
-        // Evaluate from hub chain and all spoke chains
-
-        //TODO - Implement spoke chains evaluation
-
-        (uint256 hubChainValue, uint256 hubChainVol) = evaluateHubChainTokens();
-
-        totalValueInUSD = hubChainValue;
-        totalValueInVolatility = hubChainVol;
-
-        return (totalValueInUSD, totalValueInVolatility);
-    }
 
     function getTotalVaultVolatility() public view returns(uint256) {
         return totalValueInVolatility/totalValueInUSD;
@@ -136,26 +116,6 @@ contract VaultHubChainAccount is ERC20, IERC165, IERC1271, IERC6551Account, IERC
     }
 
     
-
-    function getQuotaPrice() public view returns (uint256) {
-        if(totalSupply() == 0) {
-            return 1;
-        }
-        return totalValueInUSD / totalSupply();
-    }
-
-    function deposit(uint256 _amountInCurrencyToken) public {
-        require(_isValidSigner(msg.sender), "Invalid signer");
-
-        uint256 amountInQuota = _amountInCurrencyToken / getQuotaPrice();
-
-        currencyToken.transferFrom(msg.sender, address(this), _amountInCurrencyToken);
-
-        _mint(msg.sender, amountInQuota);
-
-
-        emit Deposit(msg.sender, _amountInCurrencyToken, amountInQuota);
-    }
 
 
     // STANDARD ERC6551 FUNCTIONS

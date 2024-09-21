@@ -83,7 +83,16 @@ contract VaultHubChainFactory is Ownable, OApp, OAppOptionsType3,  ERC721 {
     }
 
 
-    function createSpokeChainAccount(uint256 vaultId, uint256 chainId) public payable{
+    function setSpokeChainConfig(uint256 chainId, address spokeChainRegistry, address spokeChainImplementation, uint32 spokeChainEid) public onlyOwner {
+        spokeChainsRegistries[chainId] = spokeChainRegistry;
+        spokeChainsImplementations[chainId] = spokeChainImplementation;
+        spokeChainsIds[chainId] = spokeChainEid;
+
+        setPeer(spokeChainEid, bytes32(uint256(uint160(spokeChainRegistry))));
+    }
+
+
+    function createSpokeChainAccount(uint256 vaultId, uint256 chainId) public payable returns(address){
         require(_msgSender() == vaultHubChainAccounts[vaultId], "Only vault account can call this function");
 
         uint128 GAS_LIMIT = 1000000; // Gas limit for the executor
@@ -99,6 +108,16 @@ contract VaultHubChainFactory is Ownable, OApp, OAppOptionsType3,  ERC721 {
             payable(msg.sender) 
         );
 
+        address accountCreated = registry.account(
+            spokeChainsImplementations[chainId],
+            chainId,
+            address(this),
+            vaultId,
+            0
+        );
+
+        return accountCreated;
+
     }
 
     function quote(
@@ -110,6 +129,8 @@ contract VaultHubChainFactory is Ownable, OApp, OAppOptionsType3,  ERC721 {
         bytes memory payload = abi.encode(_message);
         fee = _quote(_dstEid, payload, _options, _payInLzToken);
     }
+
+
     
 
     function _lzReceive(
@@ -131,5 +152,8 @@ contract VaultHubChainFactory is Ownable, OApp, OAppOptionsType3,  ERC721 {
 
         return abi.encode(erc6551implementationTarget, chainId, tokenContract, vaultId);
     }
+
+
+
      
 }
