@@ -138,7 +138,6 @@ contract VaultHubChainAccount is ERC20, IERC165, IERC1271, IERC6551Account, IERC
     }
 
     
-
     function getQuotaPrice() public view returns (uint256) {
         if(totalSupply() == 0) {
             return 1;

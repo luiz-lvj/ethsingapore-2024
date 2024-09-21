@@ -116,8 +116,6 @@ contract VaultSpokeChainAccount is IERC165, IERC1271, IERC6551Account, IERC6551E
     }
 
     
-
-
     // STANDARD ERC6551 FUNCTIONS
     function execute(
         address to,
