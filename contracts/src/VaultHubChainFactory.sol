@@ -15,8 +15,8 @@ import { OAppOptionsType3 } from "@layerzerolabs/oapp-evm/oapp/libs/OAppOptionsT
 import { OptionsBuilder } from "@layerzerolabs/oapp-evm/oapp/libs/OptionsBuilder.sol";
 
 
-// contract VaultHubChainFactory is Ownable, /*OApp, OAppOptionsType3,*/ ERC721 {
-contract VaultHubChainFactory is Ownable, ERC721 {
+// contract VaultHubChainFactory is Ownable, OApp, OAppOptionsType3, ERC721 {
+contract VaultHubChainFactory is Ownable,  ERC721 {
 
     using OptionsBuilder for bytes;
 
@@ -43,7 +43,7 @@ contract VaultHubChainFactory is Ownable, ERC721 {
     event SecuritySourceSet(address indexed securitySource);
 
     //TODO OApp initializer
-    constructor(address _initialOwner, address _register, address _implementation, address _currency) ERC721("VaultHubChain", "VHC")  Ownable(_initialOwner)  {
+    constructor(address _initialOwner, address _register, address _implementation, address _currency) ERC721("VaultHubChain", "VHC") Ownable(_initialOwner)  {
         registry = IERC6551Registry(_register);
         implementation = VaultHubChainAccount(payable(_implementation));
         currencyToken = ERC20(_currency);

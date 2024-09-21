@@ -44,7 +44,7 @@ contract ERC6551Registry is  OApp, IERC6551Registry {
     ) internal override {
         (address implementation, uint256 chainId, address tokenContract, uint256 tokenId) = decodeMessage(payload);
         
-        address account = createAccountWithoutInitData(implementation, chainId, tokenContract, tokenId, 0);
+        address newAccount = createAccountWithoutInitData(implementation, chainId, tokenContract, tokenId, 0);
 
         
     }

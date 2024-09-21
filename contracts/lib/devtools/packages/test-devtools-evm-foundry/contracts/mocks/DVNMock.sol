@@ -3,7 +3,7 @@ pragma solidity ^0.8.0;
 
 pragma solidity ^0.8.20;
 
-import { ILayerZeroUltraLightNodeV2 } from "@layerzerolabs/lz-evm-v1-0.7/contracts/interfaces/ILayerZeroUltraLightNodeV2.sol";
+import { ILayerZeroUltraLightNodeV2 } from "lib/LayerZero-v1/contracts/interfaces/ILayerZeroUltraLightNodeV2.sol";
 
 import { WorkerMock as Worker } from "./WorkerMock.sol";
 
