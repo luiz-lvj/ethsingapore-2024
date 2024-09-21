@@ -112,6 +112,8 @@ contract VaultHubChainAccount is ERC20, IERC165, IERC1271, IERC6551Account, IERC
         //TODO - Implement spoke chains evaluation
 
         (uint256 hubChainValue, uint256 hubChainVol) = evaluateHubChainTokens();
+        console.log("HubChainValue: ", hubChainValue);
+        console.log("HubChainVol: ", hubChainVol);
 
         totalValueInUSD = hubChainValue;
         totalValueInVolatility = hubChainVol;
@@ -141,7 +143,7 @@ contract VaultHubChainAccount is ERC20, IERC165, IERC1271, IERC6551Account, IERC
         if(totalSupply() == 0) {
             return 1;
         }
-        return totalValueInUSD / totalSupply();
+        return totalValueInUSD * 10 ** decimals() / totalSupply();
     }
 
     function deposit(uint256 _amountInCurrencyToken) public {

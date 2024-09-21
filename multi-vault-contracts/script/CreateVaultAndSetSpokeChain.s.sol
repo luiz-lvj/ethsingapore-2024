@@ -32,15 +32,9 @@ contract  SetupConfigHubChainFactoryRegistrySepoliaToLineaSepolia is Script {
 
         uint256 lineaSepoliaChainId = 59141;
 
-        vault.registerNewSpokeChain{ value: 100000000000000000 }(vaultId, lineaSepoliaChainId);
+        vault.registerNewSpokeChain{ value: 250000000000000000 }(vaultId, lineaSepoliaChainId);
 
 
-
-
-
-
-        
-        
         vm.stopBroadcast();
         
     }
