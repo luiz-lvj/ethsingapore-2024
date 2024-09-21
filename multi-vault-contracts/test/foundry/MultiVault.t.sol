@@ -2,24 +2,37 @@
 pragma solidity ^0.8.13;
 
 import {Test, console} from "forge-std/Test.sol";
-import { ERC6551Registry } from "../src/ERC6551Registry.sol";
-import { VaultHubChainAccount } from "../src/VaultHubChainAccount.sol";
-import { VaultHubChainFactory } from "../src/VaultHubChainFactory.sol";
-import { SecuritySource } from "../src/SecuritySource.sol";
-import { MockERC20 } from "../src/mocks/MockERC20.sol";
-import { MockChainlinkDataFeed } from "../src/mocks/MockChainlinkDataFeed.sol";
+import { ERC6551Registry } from "../../contracts/ERC6551Registry.sol";
+import { VaultHubChainAccount } from "../../contracts/VaultHubChainAccount.sol";
+import { VaultHubChainFactory } from "../../contracts/VaultHubChainFactory.sol";
+import { SecuritySource } from "../../contracts/SecuritySource.sol";
+import { MockERC20 } from "../../contracts/mocks/MockERC20.sol";
+import { MockChainlinkDataFeed } from "../../contracts/mocks/MockChainlinkDataFeed.sol";
 
-import { TestHelperOz5 } from "lib/devtools/packages/test-devtools-evm-foundry/contracts/TestHelperOz5.sol";
+import { TestHelperOz5 } from "@layerzerolabs/test-devtools-evm-foundry/contracts/TestHelperOz5.sol";
 
-contract VaultTest is Test {
+contract VaultTest is TestHelperOz5 {
     ERC6551Registry public registry;
     VaultHubChainAccount public implementation;
     VaultHubChainFactory public factory;
     MockERC20 public currency;
 
     SecuritySource public securitySource;
+
+    uint32 private aEid = 1;
+    uint32 private bEid = 2;
+
+
+    address private userA = address(0x1);
+    address private userB = address(0x2);
     
-    function setUp() public {
+    function setUp() public override {
+
+        vm.deal(userA, 1000 ether);
+        vm.deal(userB, 1000 ether);
+
+        super.setUp();
+        setUpEndpoints(2, LibraryType.UltraLightNode);
 
         registry = new ERC6551Registry();
         implementation = new VaultHubChainAccount();
@@ -29,7 +42,7 @@ contract VaultTest is Test {
         console.log("Registry address: ", address(registry));
         console.log("Implementation address: ", address(implementation));
         console.log("Owner address: ", address(this));
-        factory = new VaultHubChainFactory(address(this), address(registry), address(implementation), address(currency));
+        factory = new VaultHubChainFactory(address(this), address(registry), address(implementation), address(currency), endpoints[aEid]);
         
     }
 

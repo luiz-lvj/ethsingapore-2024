@@ -20,3 +20,8 @@ solidity-bytes-utils/=lib/solidity-bytes-utils/
 @layerzerolabs/lz-evm-messagelib-v2/=lib/layerzero-v2/packages/layerzero-v2/evm/messagelib/
 
 @layerzerolabs/test-devtools-evm-foundry/=lib/devtools/packages/test-devtools-evm-foundry
+
+@layerzerolabs/lz-evm-messagelib-v2/=lib/layerzero-v2/packages/layerzero-v2/evm/messagelib/
+
+
+@layerzerolabs/lz-evm-protocol-v2/=lib/layerzero-v2/packages/layerzero-v2/evm/protocol/

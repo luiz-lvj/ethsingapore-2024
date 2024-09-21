@@ -1,0 +1,9 @@
+[submodule "node_modules/@layerzerolabs/toolbox-foundry/lib/openzeppelin-contracts"]
+	path = node_modules/@layerzerolabs/toolbox-foundry/lib/openzeppelin-contracts
+	url = https://github.com/OpenZeppelin/openzeppelin-contracts
+[submodule "node_modules/@layerzerolabs/toolbox-foundry/lib/openzeppelin-contracts-upgradeable"]
+	path = node_modules/@layerzerolabs/toolbox-foundry/lib/openzeppelin-contracts-upgradeable
+	url = https://github.com/OpenZeppelin/openzeppelin-contracts-upgradeable
+[submodule "node_modules/@layerzerolabs/toolbox-foundry/lib/foundry-chainlink-toolkit"]
+	path = node_modules/@layerzerolabs/toolbox-foundry/lib/foundry-chainlink-toolkit
+	url = https://github.com/smartcontractkit/foundry-chainlink-toolkit

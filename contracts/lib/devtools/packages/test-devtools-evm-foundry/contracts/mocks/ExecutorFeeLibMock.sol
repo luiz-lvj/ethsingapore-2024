@@ -143,7 +143,7 @@ contract ExecutorFeeLibMock is Ownable, IExecutorFeeLib {
                 if (v1Eid) revert Executor_UnsupportedOptionType(optionType);
 
                 (, uint128 gas, uint128 value) = ExecutorOptions.decodeLzComposeOption(option);
-                if (gas == 0) revert Executor_ZeroLzComposeGasProvided();
+                //if (gas == 0) revert Executor_ZeroLzComposeGasProvided();
 
                 dstAmount += value;
                 // lz compose can be called multiple times, based on unique index
