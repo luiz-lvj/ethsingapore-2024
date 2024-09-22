@@ -77,8 +77,8 @@ This command will compile all the smart contracts and generate the necessary bui
 
 Run the Tests: After successfully building the project, run the tests for the Uniswap Hook by executing:
 
-    ```bash
-    forge test
+   ```bash
+   forge build
 
 
 ### 🧪 Running the LayerZero Tests
@@ -93,3 +93,69 @@ To ensure that the LayerZero functionality works as expected, follow these steps
 
    ```bash
    npm run test:forge
+
+
+## 🚀 Deployment Guide: Sepolia & Linea Sepolia
+
+This section will guide you through the deployment process of the protocol on **Sepolia** (hub chain) and **Linea Sepolia** (spoke chain). Follow these steps to successfully deploy and configure the system across both chains.
+
+### 📝 Steps to Deploy
+
+### 1. **Deploy the Factory on Hub Chain (Sepolia)**
+
+Start by deploying the **factory contract** on the **hub chain (Sepolia)**. This will act as the primary point for vault creation and asset management on the hubchain.
+
+- **Script to run**:
+  ```bash
+  forge script DeployHubChainSepolia.s.sol --broadcast --verify
+
+
+### 2. Deploy the Registry and Implementation on Spoke Chain (Linea Sepolia)
+
+Next, deploy the registry contract and the implementation account on the spoke chain (Linea Sepolia). Additionally, you will set the hub chain factory contract as a peer to the registry contract on the spoke chain.
+
+Script to run:
+
+`forge script DeployRegistrySpokeChainLineaSepolia.s.sol --broadcast --verify``
+
+### 3. Configure the Spoke Chain on the Hub Chain
+Once the registry and implementation have been deployed on the spoke chain, configure the hub chain factory to recognize the spoke chain by setting the registry contract as a peer.
+
+Script:
+`forge script SetupConfigHubChainFactoryRegistrySepoliaToLineaSepolia.s.sol --broadcast --verify`
+
+### 4. Create Spoke Chain Account from Hub Chain
+After setting up the spoke chain configuration, proceed to create the spoke chain account using the hub chain. This will establish the vault's presence across both chains.
+
+Script:
+`forge script CreateVaultAndSetSpokeChain.s.sol --broadcast --verify`
+
+
+### 5. Setup the Security Source
+To finalize the deployment, set up the Security Source on Sepolia. This ensures that the vault has the necessary security configurations to manage risk.
+
+Script to run:
+`forge script SetupSecuritySourceSepolia.s.sol --broadcast --verify``
+
+
+
+## 📜 Contracts Deployed
+
+### **Sepolia Deployment (Hub Chain)**
+
+- **Registry address**: `0x88C181cfD9Bc44a0426E1083DEa3ba35e63aEfE7`
+- **Implementation address**: `0x4eEA5e913438230895d1C141c3282A37f808e794`
+- **Currency address**: `0x5B71e5EED1BFee7f85169eDDee6b48F1abd68431`
+- **Owner address**: `0x000ef5F21dC574226A06C76AAE7060642A30eB74`
+- **Endpoint Sepolia address**: `0x6EDCE65403992e310A62460808c4b910D972f10f`
+- **Security Source address**: `0x5140dF8128A644c9517d18C58a00c8e8FB9677b5`
+- **Factory address**: `0xc9A98C1697B7F46d2074bf8aFEE41F516cAbDCd0`
+
+### **Linea Sepolia Deployment (Spoke Chain)**
+
+- **Registry address**: `0x7aB14fBC0D7790C78a48aFE5ae99F6ef27C390d5`
+- **Implementation address**: `0x897Ad29e1c4649Dbe4a6b76CC249b7688deb9415`
+
+
+
+
