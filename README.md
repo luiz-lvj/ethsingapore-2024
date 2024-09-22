@@ -1,134 +1,60 @@
-# v4-template
-### **A template for writing Uniswap v4 Hooks 🦄**
+## 🌐 General Overview
 
-[`Use this Template`](https://github.com/uniswapfoundation/v4-template/generate)
+Welcome to our **decentralized multichain asset management protocol**, an innovative system designed to manage digital assets across multiple blockchains while ensuring security, efficiency, and flexibility. This protocol leverages cutting-edge technologies such as **ERC6551** for advanced NFT-based asset ownership, **LayerZero** for omnichain communication, **Chainlink** oracles for reliable price and volatility data, and **Uniswap** for decentralized trading with built-in risk management. Together, these components create a robust framework for seamless cross-chain asset management, tailored to meet the needs of both managers and depositors.
 
-1. The example hook [Counter.sol](src/Counter.sol) demonstrates the `beforeSwap()` and `afterSwap()` hooks
-2. The test template [Counter.t.sol](test/Counter.t.sol) preconfigures the v4 pool manager, test tokens, and test liquidity.
+### 🔗 The Hub and Spoke Chain Architecture
 
-<details>
-<summary>Updating to v4-template:latest</summary>
+At the core of the protocol is a **hub-and-spoke chain model**, which allows vaults to securely manage assets across multiple chains while maintaining centralized control on a hub chain. Here's how it works:
 
-This template is actively maintained -- you can update the v4 dependencies, scripts, and helpers: 
-```bash
-git remote add template https://github.com/uniswapfoundation/v4-template
-git fetch template
-git merge template/main <BRANCH> --allow-unrelated-histories
-```
+- **Vault Creation**: Every vault is created on the **hub chain**, which serves as the central chain in this multichain system. Upon vault creation, a **Non-Fungible Token (NFT)** is minted on the hub chain. This NFT serves as a digital representation of vault ownership and provides access to manage the vault’s assets.
 
-</details>
+- **ERC6551 Standard**: To facilitate more advanced NFT functionalities, we utilize the **ERC6551 standard**. This allows the NFT to not only represent ownership but also link to a vault account that holds the assets. When the NFT is minted, it simultaneously creates a **hubchain account**, where the vault’s assets will be stored on the hub chain.
 
----
+- **Spoke Chains for Asset Extension**: While the assets are initially stored on the hubchain, the protocol enables the vault manager to extend operations across multiple blockchains, known as **spoke chains**. By registering accounts on these spoke chains, the vault can interact with assets on various chains, creating a truly **multichain** management system.
 
-## Check Forge Installation
-*Ensure that you have correctly installed Foundry (Forge) and that it's up to date. You can update Foundry by running:*
+This architecture provides both flexibility and security by allowing assets to be controlled from a central hub chain, while still maintaining the capability to extend and manage assets on other chains.
 
-```
-foundryup
-```
+### 💰 Deposits, Stablecoins, and Position Representation
 
-## Set up
+The vault is designed to handle **deposits** in the form of **stablecoins**. These stablecoins provide a stable asset base for vault management and are key to ensuring predictable and secure operations for depositors. Here’s how the deposit process works:
 
-*requires [foundry](https://book.getfoundry.sh)*
+- **Depositor Interaction**: When a depositor wishes to contribute to the vault, they deposit a **stablecoin** (such as USDC or DAI). However, before the deposit is accepted, the protocol needs to determine the **quota price** of the vault, ensuring that the depositor’s position is accurately valued based on real-time market data.
 
-```
-forge install
-forge test
-```
+- **Chainlink Price Feeds**: To ensure accurate pricing, the protocol integrates **Chainlink oracles**. These oracles fetch the latest price data from decentralized sources, ensuring that the vault’s quota price is always up-to-date and tamper-proof. The depositor’s position is then calculated based on the vault’s current value, and they receive **ERC20 tokens** that represent their share or position in the vault.
 
-### Local Development (Anvil)
+- **ERC20 Position Tokens**: These ERC20 tokens function as a liquid representation of the depositor’s ownership stake in the vault. As the value of the vault fluctuates, these tokens reflect the current worth of the depositor’s position, providing full transparency and liquidity.
 
-Other than writing unit tests (recommended!), you can only deploy & test hooks on [anvil](https://book.getfoundry.sh/anvil/)
+### 🌍 Omnichain Asset Management with LayerZero
 
-```bash
-# start anvil, a local EVM chain
-anvil
+One of the key innovations of the protocol is its **omnichain** capability, made possible by **LayerZero**, a decentralized interoperability protocol. LayerZero allows seamless communication between the hub chain and various spoke chains, enabling the vault manager to securely manage assets across multiple chains.
 
-# in a new terminal
-forge script script/Anvil.s.sol \
-    --rpc-url http://localhost:8545 \
-    --private-key 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80 \
-    --broadcast
-```
+- **Spoke Chain Registration**: In order to extend asset management to a new chain, the vault manager registers a **spoke account** on the desired spoke chain. This process is facilitated by a **LayerZero Omnichain Application (OApp)**, which handles cross-chain messaging and transactions. The OApp consists of two main components:
+  - **Factory Contract**: Deployed on the hub chain, this contract serves as the central point for managing vault registrations on spoke chains.
+  - **Registry Contract**: Deployed on the spoke chains, this contract interacts with the hubchain’s factory to register the vault’s spoke account. The registry also includes the **_lzReceive** function, which handles incoming cross-chain transactions.
 
-<details>
-<summary><h3>Testnets</h3></summary>
+- **Omnichain Transactions**: When the vault manager wants to register a spoke account on a new chain, they initiate a transaction on the **Factory contract** on the hub chain. The Factory then communicates with the **Registry contract** on the spoke chain via **LayerZero** to complete the registration process. This allows the vault to securely hold assets on the spoke chain while still being centrally managed from the hub.
 
-NOTE: 11/21/2023, the Goerli deployment is out of sync with the latest v4. **It is recommend to use local testing instead**
+This structure ensures that each vault maintains control over its assets across multiple chains while reducing the risk associated with cross-chain operations.
 
-~~For testing on Goerli Testnet the Uniswap Foundation team has deployed a slimmed down version of the V4 contract (due to current contract size limits) on the network.~~
+### 📊 Asset Volatility and Risk Management
 
-~~The relevant addresses for testing on Goerli are the ones below~~
+Risk management is critical in decentralized finance, especially in multichain environments where assets are spread across different blockchains with varying levels of volatility. The protocol employs a sophisticated risk management strategy powered by **Chainlink oracles** and a custom **Uniswap Hook**.
 
-```bash
-POOL_MANAGER = 0x0
-POOL_MODIFY_POSITION_TEST = 0x0
-SWAP_ROUTER = 0x0
-```
+- **Volatility Tracking**: The protocol continuously tracks the **volatility** of each asset within the vault using data provided by **Chainlink**. This volatility data is used to assess the risk of the assets held in the vault, providing both the manager and depositors with clear insights into the vault’s exposure.
 
-Update the following command with your own private key:
+- **Total Value Locked (TVL)**: Each vault tracks its **Total Value Locked (TVL)** in USD, representing the overall value of the assets held. The vault’s volatility is then calculated based on the weighted volatility of each asset divided by the TVL. This provides a clear picture of the vault’s risk profile.
 
-```
-forge script script/00_Counter.s.sol \
---rpc-url https://rpc.ankr.com/eth_goerli \
---private-key [your_private_key_on_goerli_here] \
---broadcast
-```
+- **Uniswap Hook for Transaction Risk Management**: To further mitigate risk, a custom **Uniswap Hook** is implemented. This hook monitors every transaction involving asset swaps on Uniswap, calculating the **delta volatility** — the difference in volatility between the assets being traded. This ensures that no transaction exceeds the vault’s allowed maximum volatility threshold. Additionally, the hook verifies that all tokens involved in the transaction are **whitelisted**, adding an extra layer of security.
 
-### *Deploying your own Tokens For Testing*
+This combination of **Chainlink volatility tracking** and **Uniswap risk management** ensures that the protocol remains secure and that all transactions adhere to predefined risk parameters.
 
-Because V4 is still in testing mode, most networks don't have liquidity pools live on V4 testnets. We recommend launching your own test tokens and expirementing with them that. We've included in the templace a Mock UNI and Mock USDC contract for easier testing. You can deploy the contracts and when you do you'll have 1 million mock tokens to test with for each contract. See deployment commands below
+### 🔐 Security and Reliability
 
-```
-forge create script/mocks/mUNI.sol:MockUNI \
---rpc-url [your_rpc_url_here] \
---private-key [your_private_key_on_goerli_here]
-```
+Security is at the forefront of the protocol’s design, with several layers of protection in place:
 
-```
-forge create script/mocks/mUSDC.sol:MockUSDC \
---rpc-url [your_rpc_url_here] \
---private-key [your_private_key_on_goerli_here]
-```
+- **Decentralized Ownership**: By leveraging the ERC6551 standard, vault ownership is decentralized and tied to NFTs, ensuring that ownership and control are immutable and secure.
+- **Cross-Chain Security**: LayerZero’s omnichain messaging protocol ensures secure communication between chains, reducing the risk of exploits during cross-chain operations.
+- **Price and Volatility Oracles**: Chainlink oracles provide tamper-proof price and volatility data, ensuring that the vault’s assets are accurately valued and managed.
+- **Risk Management**: The Uniswap Hook enforces strict risk parameters, preventing transactions from exceeding volatility limits and ensuring that only whitelisted tokens are involved.
 
-</details>
-
----
-
-<details>
-<summary><h2>Troubleshooting</h2></summary>
-
-
-
-### *Permission Denied*
-
-When installing dependencies with `forge install`, Github may throw a `Permission Denied` error
-
-Typically caused by missing Github SSH keys, and can be resolved by following the steps [here](https://docs.github.com/en/github/authenticating-to-github/connecting-to-github-with-ssh) 
-
-Or [adding the keys to your ssh-agent](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent#adding-your-ssh-key-to-the-ssh-agent), if you have already uploaded SSH keys
-
-### Hook deployment failures
-
-Hook deployment failures are caused by incorrect flags or incorrect salt mining
-
-1. Verify the flags are in agreement:
-    * `getHookCalls()` returns the correct flags
-    * `flags` provided to `HookMiner.find(...)`
-2. Verify salt mining is correct:
-    * In **forge test**: the *deploye*r for: `new Hook{salt: salt}(...)` and `HookMiner.find(deployer, ...)` are the same. This will be `address(this)`. If using `vm.prank`, the deployer will be the pranking address
-    * In **forge script**: the deployer must be the CREATE2 Proxy: `0x4e59b44847b379578588920cA78FbF26c0B4956C`
-        * If anvil does not have the CREATE2 deployer, your foundry may be out of date. You can update it with `foundryup`
-
-</details>
-
----
-
-Additional resources:
-
-[v4-periphery](https://github.com/uniswap/v4-periphery) contains advanced hook implementations that serve as a great reference
-
-[v4-core](https://github.com/uniswap/v4-core)
-
-[v4-by-example](https://v4-by-example.org)
-
+In summary, this protocol provides a comprehensive, secure, and flexible system for managing assets across multiple blockchains. By leveraging the power of **ERC6551**, **LayerZero**, **Chainlink**, and **Uniswap**, the protocol offers a decentralized solution that prioritizes security, efficiency, and transparency for both managers and depositors.

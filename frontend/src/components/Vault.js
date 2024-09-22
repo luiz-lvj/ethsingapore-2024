@@ -158,7 +158,7 @@ export default function VaultPage({
                 signer
             );
 
-            const tx = await vaultCountract.registerNewSpokeChain(id, chainIdToRegister);
+            const tx = await vaultCountract.registerNewSpokeChain(id, chainIdToRegister, {value: ethers.utils.parseEther("0.2")});
 
             window.open(`https://testnet.layerzeroscan.com/tx/${tx.hash}`);
 
