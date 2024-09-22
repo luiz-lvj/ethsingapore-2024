@@ -157,5 +157,21 @@ Script to run:
 - **Implementation address**: `0x897Ad29e1c4649Dbe4a6b76CC249b7688deb9415`
 
 
+Second Deployment:
+
+-------- LINEA DEPLOYMENT  (Hub chain) --------
+  Registry address:  0xbe01a08eF192Bb9a5DF8eD9CD9133481574247AD
+  Implementation address:  0x07f0a0d79f7F0366c0050218C2Bd6121787cdf8e
+  currency address:  0x50914077B638196Eff4bCAB090b6d8e8f19b53eE
+  Owner address:  0x000ef5F21dC574226A06C76AAE7060642A30eB74
+  Endpoint Sepolia address:  0x6EDCE65403992e310A62460808c4b910D972f10f
+  Security Source address:  0x68A4AC5F5942744BCbd51482F9b81e9FA3408139
+  Factory address:  0x22599F1d29F97F66ECdAAfD03dc8bE60ac45575D
+
+  -------- BASE SEPOLIA DEPLOYMENT  (Spoke Chain) --------
+  Registry address:  0x3546914261a14D476671B02498420aDBbE7cA69A
+  Implementation address:  0xA261F923654Eb93Ab6c35D285d58c8a01D42F792
+
+
 
 

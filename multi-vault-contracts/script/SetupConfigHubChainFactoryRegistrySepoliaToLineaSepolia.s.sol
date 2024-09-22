@@ -24,12 +24,12 @@ contract  SetupConfigHubChainFactoryRegistrySepoliaToLineaSepolia is Script {
         //uint256 privateKey = vm.envUint("PRIVATE_KEY");
         vm.startBroadcast();
 
-        address factoryHubChainSepolia = 0xc9A98C1697B7F46d2074bf8aFEE41F516cAbDCd0;
-        uint32 lineaSepoliaEid = 40287;
-        address lineaSepoliaRegistryAddress = 0x7aB14fBC0D7790C78a48aFE5ae99F6ef27C390d5;
-        address lineaSepoliaImplementationAddress = 0x897Ad29e1c4649Dbe4a6b76CC249b7688deb9415;
+        address factoryHubChainSepolia = 0x22599F1d29F97F66ECdAAfD03dc8bE60ac45575D;
+        uint32 lineaSepoliaEid = 40245;
+        address lineaSepoliaRegistryAddress = 0x3546914261a14D476671B02498420aDBbE7cA69A;
+        address lineaSepoliaImplementationAddress = 0xA261F923654Eb93Ab6c35D285d58c8a01D42F792;
 
-        uint256 lineaSepoliaChainId = 59141;
+        uint256 lineaSepoliaChainId = 84532;
 
 
         factoryHubChain = VaultHubChainFactory(factoryHubChainSepolia);

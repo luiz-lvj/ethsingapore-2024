@@ -8,6 +8,8 @@ import { MockERC20 } from "../contracts/mocks/MockERC20.sol";
 import { MockChainlinkDataFeed } from "../contracts/mocks/MockChainlinkDataFeed.sol";
 import { VaultHubChainAccount } from "../contracts/VaultHubChainAccount.sol";
 
+import { MockChainlinkDataFeed } from "../contracts/mocks/MockChainlinkDataFeed.sol";
+
 import { SecuritySource } from "../contracts/SecuritySource.sol";
 
 contract DeployHubChainSepolia is Script {
@@ -16,7 +18,6 @@ contract DeployHubChainSepolia is Script {
 
     SecuritySource public securitySourceHubChain;
 
-    
 
 
 
@@ -38,7 +39,7 @@ contract DeployHubChainSepolia is Script {
         MockERC20 token1 = new MockERC20("BTC", "BTC");
         MockERC20 token2 = new MockERC20("ETH", "ETH");
         MockERC20 token3 = new MockERC20("LINK", "LINK");
-        MockERC20 currency = MockERC20(0x5B71e5EED1BFee7f85169eDDee6b48F1abd68431);
+        MockERC20 currency = MockERC20(0x50914077B638196Eff4bCAB090b6d8e8f19b53eE);
 
         address priceFeedToken4 = address(new MockChainlinkDataFeed(100000000));
         address volFeedToken4 = address(new MockChainlinkDataFeed(0));
@@ -50,25 +51,25 @@ contract DeployHubChainSepolia is Script {
         tokens[3] = address(currency);
 
         address[] memory priceFeeds = new address[](4);
-        priceFeeds[0] = 0x1b44F3514812d835EB1BDB0acB33d3fA3351Ee43;
-        priceFeeds[1] = 0x694AA1769357215DE4FAC081bf1f309aDC325306;
-        priceFeeds[2] = 0xc59E3633BAAC79493d908e63626716e204A45EdF;
+        priceFeeds[0] = address(new MockChainlinkDataFeed(6306055000000));
+        priceFeeds[1] = address(new MockChainlinkDataFeed(100000000));
+        priceFeeds[2] = address(new MockChainlinkDataFeed(50000000));
         priceFeeds[3] = priceFeedToken4;
 
         address[] memory volFeeds = new address[](4);
-        volFeeds[0] = 0xabfe1e28F54Ac40776DfCf2dF0874D37254D5F59;
-        volFeeds[1] = 0x8e604308BD61d975bc6aE7903747785Db7dE97e2;
-        volFeeds[2] = 0xd599cEF88Bbd27F1392A544bD0F343ec8893124C;
+        volFeeds[0] = address(new MockChainlinkDataFeed(67415));
+        volFeeds[1] = address(new MockChainlinkDataFeed(0));
+        volFeeds[2] = address(new MockChainlinkDataFeed(70000));
         volFeeds[3] = volFeedToken4;
 
-        address securitySourceSepolia = 0x5140dF8128A644c9517d18C58a00c8e8FB9677b5;
+        address securitySourceSepolia = 0x68A4AC5F5942744BCbd51482F9b81e9FA3408139;
         
 
         securitySourceHubChain = SecuritySource(securitySourceSepolia);
 
         securitySourceHubChain.setWhitelistedERC20Tokens(tokens, priceFeeds, volFeeds);
 
-        factoryHubChain = VaultHubChainFactory(0xc9A98C1697B7F46d2074bf8aFEE41F516cAbDCd0);
+        factoryHubChain = VaultHubChainFactory(0x22599F1d29F97F66ECdAAfD03dc8bE60ac45575D);
 
         factoryHubChain.setSecuritySourceHubchain(securitySourceSepolia);
 

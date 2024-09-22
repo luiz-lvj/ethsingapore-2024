@@ -23,8 +23,8 @@ contract DeployRegistrySpokeChainLineaSepolia is Script {
         address owner = 0x000ef5F21dC574226A06C76AAE7060642A30eB74;
         address endpointLineaSepolia = 0x6EDCE65403992e310A62460808c4b910D972f10f;
 
-        address hubChainFactory = 0xc9A98C1697B7F46d2074bf8aFEE41F516cAbDCd0;
-        uint32 sepoliaEid = 40161;
+        address hubChainFactory =  0x22599F1d29F97F66ECdAAfD03dc8bE60ac45575D;
+        uint32 sepoliaEid = 40287;
 
         registrySpokeChain = new ERC6551RegistrySpokeChain(owner, endpointLineaSepolia);
         implementationSpokeChain = new VaultSpokeChainAccount();

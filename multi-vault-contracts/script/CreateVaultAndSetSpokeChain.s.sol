@@ -9,7 +9,7 @@ import { VaultHubChainAccount } from "../contracts/VaultHubChainAccount.sol";
 
 
 
-contract  SetupConfigHubChainFactoryRegistrySepoliaToLineaSepolia is Script {
+contract  CreateVaultAndSetSpokeChain is Script {
 
 
     VaultHubChainFactory public factoryHubChain;
@@ -21,7 +21,7 @@ contract  SetupConfigHubChainFactoryRegistrySepoliaToLineaSepolia is Script {
         //uint256 privateKey = vm.envUint("PRIVATE_KEY");
         vm.startBroadcast();
 
-        address factoryHubChainSepolia = 0xAF6D8B4577b61A3F389f96D9932156Ea9632CcC8;
+        address factoryHubChainSepolia = 0x22599F1d29F97F66ECdAAfD03dc8bE60ac45575D;
 
 
         factoryHubChain = VaultHubChainFactory(factoryHubChainSepolia);
@@ -30,7 +30,7 @@ contract  SetupConfigHubChainFactoryRegistrySepoliaToLineaSepolia is Script {
 
         VaultHubChainAccount vault = VaultHubChainAccount(payable(factoryHubChain.vaultHubChainAccounts(vaultId)));
 
-        uint256 lineaSepoliaChainId = 59141;
+        uint256 lineaSepoliaChainId = 84532;
 
         vault.registerNewSpokeChain{ value: 250000000000000000 }(vaultId, lineaSepoliaChainId);
 
