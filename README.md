@@ -1,6 +1,6 @@
 ## 🌐 General Overview
 
-Welcome to our **decentralized multichain asset management protocol**, an innovative system designed to manage digital assets across multiple blockchains while ensuring security, efficiency, and flexibility. This protocol leverages cutting-edge technologies such as **ERC6551** for advanced NFT-based asset ownership, **LayerZero** for omnichain communication, **Chainlink** oracles for reliable price and volatility data, and **Uniswap** for decentralized trading with built-in risk management. Together, these components create a robust framework for seamless cross-chain asset management, tailored to meet the needs of both managers and depositors.
+Welcome to our **MultiVaul**, an innovative system designed to manage digital assets across multiple blockchains while ensuring security, efficiency, and flexibility. This protocol leverages cutting-edge technologies such as **ERC6551** for advanced NFT-based asset ownership, **LayerZero** for omnichain communication, **Chainlink** oracles for reliable price and volatility data, and **Uniswap** for decentralized trading with built-in risk management. Together, these components create a robust framework for seamless cross-chain asset management, tailored to meet the needs of both managers and depositors.
 
 ### 🔗 The Hub and Spoke Chain Architecture
 
@@ -18,7 +18,7 @@ This architecture provides both flexibility and security by allowing assets to b
 
 The vault is designed to handle **deposits** in the form of **stablecoins**. These stablecoins provide a stable asset base for vault management and are key to ensuring predictable and secure operations for depositors. Here’s how the deposit process works:
 
-- **Depositor Interaction**: When a depositor wishes to contribute to the vault, they deposit a **stablecoin** (such as USDC or DAI). However, before the deposit is accepted, the protocol needs to determine the **quota price** of the vault, ensuring that the depositor’s position is accurately valued based on real-time market data.
+- **Depositor Interaction**: When a depositor wishes to contribute to the vault, they deposit a **stablecoin**  (the currency of the protocol, USDC for example). However, before the deposit is accepted, the protocol needs to determine the **quota price** of the vault, ensuring that the depositor’s position is accurately valued based on real-time market data.
 
 - **Chainlink Price Feeds**: To ensure accurate pricing, the protocol integrates **Chainlink oracles**. These oracles fetch the latest price data from decentralized sources, ensuring that the vault’s quota price is always up-to-date and tamper-proof. The depositor’s position is then calculated based on the vault’s current value, and they receive **ERC20 tokens** that represent their share or position in the vault.
 
@@ -58,3 +58,38 @@ Security is at the forefront of the protocol’s design, with several layers of 
 - **Risk Management**: The Uniswap Hook enforces strict risk parameters, preventing transactions from exceeding volatility limits and ensuring that only whitelisted tokens are involved.
 
 In summary, this protocol provides a comprehensive, secure, and flexible system for managing assets across multiple blockchains. By leveraging the power of **ERC6551**, **LayerZero**, **Chainlink**, and **Uniswap**, the protocol offers a decentralized solution that prioritizes security, efficiency, and transparency for both managers and depositors.
+
+
+### 🧪 Testing the Uniswap Hook
+
+To ensure the Uniswap Hook functions as expected, you can build and test it using the following steps:
+
+1. **Navigate to the Project Directory**:
+   Open your terminal and navigate to the `hook-risk` folder.
+
+2. **Build the Project**:
+   Before running the tests, ensure the project is built by using the `forge` tool:
+
+   ```bash
+   forge build
+
+This command will compile all the smart contracts and generate the necessary build artifacts.
+
+Run the Tests: After successfully building the project, run the tests for the Uniswap Hook by executing:
+
+    ```bash
+    forge test
+
+
+### 🧪 Running the LayerZero Tests
+
+To ensure that the LayerZero functionality works as expected, follow these steps to build and run the tests:
+
+1. **Navigate to the Project Directory**:
+   Open your terminal and navigate to the root directory of the project.
+
+2. **Run the Tests**:
+   To execute the tests for LayerZero integration, use the following command:
+
+   ```bash
+   npm run test:forge
