@@ -77,8 +77,8 @@ This command will compile all the smart contracts and generate the necessary bui
 
 Run the Tests: After successfully building the project, run the tests for the Uniswap Hook by executing:
 
-   ```bash
-   forge build
+    `forge test`
+
 
 
 ### 🧪 Running the LayerZero Tests
